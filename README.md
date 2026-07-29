@@ -57,7 +57,8 @@ python3 scripts/token_usage.py --model "gpt-5*,claude-*" --format json
 `--runtime` 与 `--model` 可以组合使用。使用 `--diagnostics` 可将脱敏后的
 适配器状态码写入标准错误；`--home PATH` 仅用于扫描替代的主目录或测试夹具。
 Markdown 表格中的 token 数按数值自动使用“亿、百万、K、Token”单位，
-并固定保留三位小数；JSON 仍保留精确整数，便于后续计算。
+并固定保留三位小数；表格按终端显示宽度对齐中英文列；JSON 仍保留精确整数，
+便于后续计算。
 
 ### 周期定义
 
@@ -145,10 +146,11 @@ The Markdown output is a ready-to-read brief:
 ```
 
 Markdown token tables select `亿` (100 million), `百万` (million), `K`, or
-`Token` according to each value and always show three decimal places. JSON
-retains exact integer token counts for deterministic downstream analysis. The
-following is an abbreviated shape; the real output also includes runtime/model
-rankings, quality metrics, and sanitized diagnostics:
+`Token` according to each value, always show three decimal places, and align
+mixed Chinese/English columns by terminal display width. JSON retains exact
+integer token counts for deterministic downstream analysis. The following is
+an abbreviated shape; the real output also includes runtime/model rankings,
+quality metrics, and sanitized diagnostics:
 
 ```json
 {

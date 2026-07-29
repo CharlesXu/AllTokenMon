@@ -1,5 +1,6 @@
 import json
 import unittest
+import unicodedata
 from datetime import datetime, timedelta, timezone
 
 from scripts.alltokenmon.aggregate import aggregate
@@ -13,6 +14,22 @@ from scripts.alltokenmon.schema import (
 
 
 NOW = datetime(2026, 7, 28, 12, tzinfo=timezone(timedelta(hours=8)))
+
+
+def _cells(rendered, prefix):
+    line = next(line for line in rendered.splitlines() if line.startswith(prefix))
+    return [cell.strip() for cell in line.split("|")[1:-1]]
+
+
+def _display_width(value):
+    return sum(
+        0
+        if unicodedata.combining(character)
+        else 2
+        if unicodedata.east_asian_width(character) in ("W", "F")
+        else 1
+        for character in value
+    )
 
 
 def _report(cost=None, runtime="codex", model="gpt-5", tokens=None):
@@ -116,10 +133,13 @@ class MarkdownReportTests(unittest.TestCase):
         self.assertIn("# All Token Monitor 完整报告", rendered)
         self.assertIn("**状态：** partial", rendered)
         self.assertIn("## Token 用量周期表", rendered)
-        self.assertIn("| 今日 |", rendered)
-        self.assertIn("| 近 7 日 |", rendered)
-        self.assertIn("| 本月至今 |", rendered)
-        self.assertIn("| 全部历史 |", rendered)
+        for prefix, label in (
+            ("| 今日", "今日"),
+            ("| 近 7 日", "近 7 日"),
+            ("| 本月至今", "本月至今"),
+            ("| 全部历史", "全部历史"),
+        ):
+            self.assertEqual(_cells(rendered, prefix)[0], label)
         self.assertIn("## 运行时分布（全部历史）", rendered)
         self.assertIn("## 主要模型（全部历史，≥1% 占比）", rendered)
         self.assertIn("## 要点点评", rendered)
@@ -151,23 +171,75 @@ class MarkdownReportTests(unittest.TestCase):
             )
         )
 
-        self.assertIn("| 今日 | 3.940 亿 | 12.500 百万 | 80.000 Token |", rendered)
-        self.assertIn("| 999.999 K | 0.000 Token | **4.075 亿** |", rendered)
-        self.assertIn("| codex | 2 | 4.075 亿 | 100.00% |", rendered)
+        self.assertEqual(
+            _cells(rendered, "| 今日"),
+            [
+                "今日",
+                "3.940 亿",
+                "12.500 百万",
+                "80.000 Token",
+                "999.999 K",
+                "0.000 Token",
+                "**4.075 亿**",
+                "—",
+            ],
+        )
+        self.assertEqual(
+            _cells(rendered, "| codex"),
+            ["codex", "2", "4.075 亿", "100.00%"],
+        )
 
     def test_markdown_small_usage_uses_token_unit_instead_of_zero(self):
         rendered = render_markdown(_report())
 
-        self.assertIn("| 今日 | 80.000 Token | 20.000 Token | 11.000 Token |", rendered)
+        self.assertEqual(
+            _cells(rendered, "| 今日")[:4],
+            ["今日", "80.000 Token", "20.000 Token", "11.000 Token"],
+        )
 
     def test_markdown_lists_model_runtime_usage_and_fact_based_commentary(self):
         rendered = render_markdown(_report())
 
-        self.assertIn("| gpt-5 | 120.000 Token | 100.00% | codex |", rendered)
+        self.assertEqual(
+            _cells(rendered, "| gpt-5"),
+            ["gpt-5", "120.000 Token", "100.00%", "codex"],
+        )
         self.assertIn("**codex 占比最高**", rendered)
         self.assertIn("**gpt-5 是用量最高的模型**", rendered)
         self.assertIn("缓存占输入侧比例", rendered)
         self.assertIn("输出/输入比", rendered)
+
+    def test_markdown_tables_align_by_terminal_display_width(self):
+        rendered = render_markdown(
+            _report(
+                runtime="中文-runtime",
+                model="模型-model",
+                tokens=TokenBreakdown(
+                    input=394_000_000,
+                    output=12_500_000,
+                    cache_read=999_999,
+                ),
+            )
+        )
+        blocks = []
+        current = []
+        for line in rendered.splitlines():
+            if line.startswith("|"):
+                current.append(line)
+            elif current:
+                blocks.append(current)
+                current = []
+        if current:
+            blocks.append(current)
+
+        self.assertEqual(len(blocks), 3)
+        for block in blocks:
+            column_widths = [
+                [_display_width(cell) for cell in line.split("|")[1:-1]]
+                for line in block
+            ]
+            for column in zip(*column_widths):
+                self.assertEqual(len(set(column)), 1, block)
 
     def test_markdown_consumes_only_report_mapping(self):
         report = _report()

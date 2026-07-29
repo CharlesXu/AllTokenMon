@@ -66,6 +66,52 @@ def _table_cell(value: object) -> str:
     return "".join(cleaned).replace("\\", "\\\\").replace("|", "\\|")
 
 
+def _display_width(value: str) -> int:
+    return sum(
+        0
+        if unicodedata.combining(character)
+        else 2
+        if unicodedata.east_asian_width(character) in ("W", "F")
+        else 1
+        for character in value
+    )
+
+
+def _pad_cell(value: str, width: int, *, right: bool) -> str:
+    padding = " " * (width - _display_width(value))
+    return padding + value if right else value + padding
+
+
+def _markdown_table(
+    headers: List[str],
+    rows: List[List[str]],
+    right_aligned: List[bool],
+) -> List[str]:
+    widths = [
+        max(
+            3,
+            _display_width(header),
+            *(_display_width(row[index]) for row in rows),
+        )
+        for index, header in enumerate(headers)
+    ]
+
+    def render_row(row: List[str]) -> str:
+        cells = [
+            _pad_cell(value, widths[index], right=right_aligned[index])
+            for index, value in enumerate(row)
+        ]
+        return f"| {' | '.join(cells)} |"
+
+    separator = [
+        "-" * (width - 1) + ":" if right else "-" * width
+        for width, right in zip(widths, right_aligned)
+    ]
+    return [render_row(headers), render_row(separator)] + [
+        render_row(row) for row in rows
+    ]
+
+
 def _generated_time(report: Mapping[str, object]) -> str:
     value = str(report["generated_at"])
     try:
@@ -209,22 +255,41 @@ def render_markdown(report: Mapping[str, object]) -> str:
         "",
         "## Token 用量周期表",
         "",
-        "| 周期 | 输入 Token | 输出 Token | 推理 Token | 缓存读取 | 缓存写入 | 总量 | 费用 |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
+    period_rows = []
     for key, label in PERIODS:
         period = periods[key]
         assert isinstance(period, Mapping)
         totals = period["totals"]
         assert isinstance(totals, Mapping)
-        lines.append(
-            f"| {label} | {_tokens(totals['input'])} | "
-            f"{_tokens(totals['output'])} | "
-            f"{_tokens(totals['reasoning'])} | "
-            f"{_tokens(totals['cache_read'])} | "
-            f"{_tokens(totals['cache_write'])} | "
-            f"**{_tokens(totals['total'])}** | {_cost(totals['cost'])} |"
+        period_rows.append(
+            [
+                label,
+                _tokens(totals["input"]),
+                _tokens(totals["output"]),
+                _tokens(totals["reasoning"]),
+                _tokens(totals["cache_read"]),
+                _tokens(totals["cache_write"]),
+                f"**{_tokens(totals['total'])}**",
+                _cost(totals["cost"]),
+            ]
         )
+    lines.extend(
+        _markdown_table(
+            [
+                "周期",
+                "输入 Token",
+                "输出 Token",
+                "推理 Token",
+                "缓存读取",
+                "缓存写入",
+                "总量",
+                "费用",
+            ],
+            period_rows,
+            [False, True, True, True, True, True, True, True],
+        )
+    )
 
     lines.extend(
         [
@@ -236,30 +301,38 @@ def render_markdown(report: Mapping[str, object]) -> str:
             "",
             "## 运行时分布（全部历史）",
             "",
-            "| 运行时 | 消息数 | Token 总量 | 占比 |",
-            "| --- | ---: | ---: | ---: |",
         ]
     )
     all_time = periods["all_time"]
     assert isinstance(all_time, Mapping)
     runtime_rows = all_time["runtimes"]
     assert isinstance(runtime_rows, list)
+    runtime_table_rows = []
     if not runtime_rows:
-        lines.append("| — | 0 | 0.000 Token | 0.00% |")
+        runtime_table_rows.append(["—", "0", "0.000 Token", "0.00%"])
     for row in runtime_rows:
         assert isinstance(row, Mapping)
-        lines.append(
-            f"| {_table_cell(row['runtime'])} | {int(row['message_count']):,} | "
-            f"{_tokens(row['total'])} | {_ratio(row['share'], percentage=True)} |"
+        runtime_table_rows.append(
+            [
+                _table_cell(row["runtime"]),
+                f"{int(row['message_count']):,}",
+                _tokens(row["total"]),
+                _ratio(row["share"], percentage=True),
+            ]
         )
+    lines.extend(
+        _markdown_table(
+            ["运行时", "消息数", "Token 总量", "占比"],
+            runtime_table_rows,
+            [False, True, True, True],
+        )
+    )
 
     lines.extend(
         [
             "",
             "## 主要模型（全部历史，≥1% 占比）",
             "",
-            "| 模型 | Token 总量 | 占比 | 主要用于 |",
-            "| --- | ---: | ---: | --- |",
         ]
     )
     model_rows = all_time["models"]
@@ -269,15 +342,26 @@ def render_markdown(report: Mapping[str, object]) -> str:
         for row in model_rows
         if isinstance(row, Mapping) and float(row["share"]) >= 0.01
     ]
+    model_table_rows = []
     if not major_models:
-        lines.append("| — | 0.000 Token | 0.00% | — |")
+        model_table_rows.append(["—", "0.000 Token", "0.00%", "—"])
     for row in major_models:
         assert isinstance(row, Mapping)
-        lines.append(
-            f"| {_table_cell(row['model'])} | {_tokens(row['total'])} | "
-            f"{_ratio(row['share'], percentage=True)} | "
-            f"{_model_runtimes(all_time, row['model'])} |"
+        model_table_rows.append(
+            [
+                _table_cell(row["model"]),
+                _tokens(row["total"]),
+                _ratio(row["share"], percentage=True),
+                _model_runtimes(all_time, row["model"]),
+            ]
         )
+    lines.extend(
+        _markdown_table(
+            ["模型", "Token 总量", "占比", "主要用于"],
+            model_table_rows,
+            [False, True, True, False],
+        )
+    )
 
     lines.extend(["", "## 要点点评", ""])
     for observation in _commentary(periods):
