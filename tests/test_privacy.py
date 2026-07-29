@@ -153,17 +153,18 @@ class RegistryExecutionAndPrivacyTests(unittest.TestCase):
                     base + ("--format", output_format),
                     cwd=REPO_ROOT,
                     capture_output=True,
-                    text=True,
                     check=False,
                 )
-                self.assertEqual(completed.returncode, 0, completed.stderr)
-                self.assertTrue(completed.stdout)
-                self.assertTrue(completed.stderr)
-                _assert_private(self, completed.stdout)
-                _assert_private(self, completed.stderr)
+                stdout = completed.stdout.decode("utf-8")
+                stderr = completed.stderr.decode("utf-8")
+                self.assertEqual(completed.returncode, 0, stderr)
+                self.assertTrue(stdout)
+                self.assertTrue(stderr)
+                _assert_private(self, stdout)
+                _assert_private(self, stderr)
                 if output_format == "json":
                     self.assertEqual(
-                        json.loads(completed.stdout)["coverage"]["runtime_count"],
+                        json.loads(stdout)["coverage"]["runtime_count"],
                         39,
                     )
 
