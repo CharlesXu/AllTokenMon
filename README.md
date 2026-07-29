@@ -253,7 +253,7 @@ If the development-only `coverage` package is installed, run the coverage gate:
 
 ```sh
 python3 -m coverage run --branch --source=scripts/alltokenmon -m unittest discover -s tests
-python3 -m coverage report --precision=2 --fail-under=80
+python3 -m coverage report --omit="*/_vendor/*" --precision=2 --fail-under=80
 ```
 
 The authoritative runtime evidence is in
