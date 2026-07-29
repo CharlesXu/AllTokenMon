@@ -331,6 +331,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         rendered = render_json(report)
     else:
         rendered = render_markdown(report)
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if callable(reconfigure):
+        try:
+            reconfigure(encoding="utf-8")
+        except (OSError, ValueError):
+            pass
     sys.stdout.write(rendered)
     if arguments.diagnostics:
         _write_diagnostics(diagnostics)

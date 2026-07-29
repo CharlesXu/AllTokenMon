@@ -114,6 +114,36 @@ class CliTests(unittest.TestCase):
         self.assertEqual(imported_stderr, script.stderr)
         self.assertEqual(json.loads(imported_stdout)["coverage"]["status"], "no_data")
 
+    def test_markdown_uses_utf8_when_process_default_is_cp1252(self):
+        environment = os.environ.copy()
+        environment["PYTHONIOENCODING"] = "cp1252"
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "token_usage.py"),
+                "--runtime",
+                "codex",
+                "--home",
+                str(ROOT / "tests" / "fixtures"),
+                "--format",
+                "markdown",
+                "--now",
+                NOW,
+            ],
+            cwd=ROOT,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+
+        self.assertEqual(
+            completed.returncode,
+            0,
+            completed.stderr.decode("utf-8", errors="replace"),
+        )
+        self.assertIn("亿 tokens", completed.stdout.decode("utf-8"))
+
     def test_scan_runtime_only_treats_missing_target_module_as_unavailable(self):
         target = "{}.adapters.codex".format(cli.__package__)
         missing_target = ModuleNotFoundError(name=target)
