@@ -244,7 +244,7 @@ class SqliteIoTests(unittest.TestCase):
     def setUp(self):
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary_directory.name)
-        self.path = self.root / "db ?#% ü.sqlite"
+        self.path = self.root / "db #% ü.sqlite"
         connection = sqlite3.connect(str(self.path))
         try:
             connection.execute('CREATE TABLE "z table" ("second" TEXT, "first" INT)')
