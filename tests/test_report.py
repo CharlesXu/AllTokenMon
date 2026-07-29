@@ -113,26 +113,24 @@ class MarkdownReportTests(unittest.TestCase):
     def test_markdown_contains_required_sections_and_unavailable_cost(self):
         rendered = render_markdown(_report())
 
-        self.assertIn("# Token Usage Report", rendered)
-        self.assertIn("## Coverage", rendered)
-        self.assertIn("## Period Summary", rendered)
-        self.assertIn("| Today |", rendered)
-        self.assertIn("| Week |", rendered)
-        self.assertIn("| Month |", rendered)
-        self.assertIn("| All time |", rendered)
-        self.assertIn("## Top Runtimes", rendered)
-        self.assertIn("## Top Models", rendered)
-        self.assertIn("## Cache and Input/Output Structure", rendered)
-        self.assertIn("## Data Quality", rendered)
-        self.assertIn("Unavailable", rendered)
-        self.assertIn("Partial coverage", rendered)
-        self.assertIn("Non-exact usage records", rendered)
+        self.assertIn("# All Token Monitor 完整报告", rendered)
+        self.assertIn("**状态：** partial", rendered)
+        self.assertIn("## Token 用量周期表", rendered)
+        self.assertIn("| 今日 |", rendered)
+        self.assertIn("| 近 7 日 |", rendered)
+        self.assertIn("| 本月至今 |", rendered)
+        self.assertIn("| 全部历史 |", rendered)
+        self.assertIn("## 运行时分布（全部历史）", rendered)
+        self.assertIn("## 主要模型（全部历史，≥1% 占比）", rendered)
+        self.assertIn("## 要点点评", rendered)
+        self.assertIn("—", rendered)
+        self.assertIn("部分覆盖", rendered)
         self.assertTrue(rendered.endswith("\n"))
 
     def test_markdown_renders_cost_when_provider_reported_and_is_private(self):
         rendered = render_markdown(_report(cost=2.5))
 
-        self.assertIn("2.50", rendered)
+        self.assertIn("$2.50", rendered)
         for sentinel in (
             "SECRET_SESSION",
             "SECRET_PATH",
@@ -141,26 +139,35 @@ class MarkdownReportTests(unittest.TestCase):
         ):
             self.assertNotIn(sentinel, rendered)
 
-    def test_markdown_token_tables_use_exact_yi_units(self):
+    def test_markdown_token_tables_use_adaptive_units_with_three_decimals(self):
         rendered = render_markdown(
             _report(
                 tokens=TokenBreakdown(
                     input=394_000_000,
-                    output=1_000_000,
-                    cache_read=5_000_000,
+                    output=12_500_000,
+                    cache_read=999_999,
+                    reasoning=80,
                 )
             )
         )
 
-        self.assertIn("Input (亿 tokens)", rendered)
-        self.assertIn("Total (亿 tokens)", rendered)
-        self.assertIn("| Today | 3.94 | 0.01 | 0.05 | 0 | 0 | 4 |", rendered)
-        self.assertIn("| Today | 1 | codex | 4 | 100.00% |", rendered)
+        self.assertIn("| 今日 | 3.940 亿 | 12.500 百万 | 80.000 Token |", rendered)
+        self.assertIn("| 999.999 K | 0.000 Token | **4.075 亿** |", rendered)
+        self.assertIn("| codex | 2 | 4.075 亿 | 100.00% |", rendered)
 
-    def test_markdown_yi_units_do_not_round_small_nonzero_usage_to_zero(self):
+    def test_markdown_small_usage_uses_token_unit_instead_of_zero(self):
         rendered = render_markdown(_report())
 
-        self.assertIn("| Today | 0.0000008 | 0.0000002 | 0.0000002 |", rendered)
+        self.assertIn("| 今日 | 80.000 Token | 20.000 Token | 11.000 Token |", rendered)
+
+    def test_markdown_lists_model_runtime_usage_and_fact_based_commentary(self):
+        rendered = render_markdown(_report())
+
+        self.assertIn("| gpt-5 | 120.000 Token | 100.00% | codex |", rendered)
+        self.assertIn("**codex 占比最高**", rendered)
+        self.assertIn("**gpt-5 是用量最高的模型**", rendered)
+        self.assertIn("缓存占输入侧比例", rendered)
+        self.assertIn("输出/输入比", rendered)
 
     def test_markdown_consumes_only_report_mapping(self):
         report = _report()

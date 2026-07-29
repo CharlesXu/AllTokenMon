@@ -142,7 +142,7 @@ class CliTests(unittest.TestCase):
             0,
             completed.stderr.decode("utf-8", errors="replace"),
         )
-        self.assertIn("亿 tokens", completed.stdout.decode("utf-8"))
+        self.assertIn("完整报告", completed.stdout.decode("utf-8"))
 
     def test_scan_runtime_only_treats_missing_target_module_as_unavailable(self):
         target = "{}.adapters.codex".format(cli.__package__)
@@ -243,8 +243,8 @@ class CliTests(unittest.TestCase):
             )
 
         self.assertEqual(return_code, 0)
-        self.assertTrue(stdout.startswith("# Token Usage Report\n"))
-        self.assertIn("## Period Summary", stdout)
+        self.assertTrue(stdout.startswith("# All Token Monitor 完整报告\n"))
+        self.assertIn("## Token 用量周期表", stdout)
         self.assertEqual(stderr, "")
 
     def test_home_exactly_replaces_context_home_and_env_is_copied(self):
@@ -617,7 +617,9 @@ class CliTests(unittest.TestCase):
                             "adapter_diagnostic",
                         )
                     else:
-                        self.assertTrue(stdout.startswith("# Token Usage Report\n"))
+                        self.assertTrue(
+                            stdout.startswith("# All Token Monitor 完整报告\n")
+                        )
 
     def test_unhashable_exception_type_is_sanitized_across_output_surfaces(self):
         class UnhashableExceptionMeta(type):
@@ -665,7 +667,9 @@ class CliTests(unittest.TestCase):
                     diagnostics = json.loads(stdout)["diagnostics"]
                     self.assertEqual(diagnostics[0]["code"], "adapter_error")
                 else:
-                    self.assertTrue(stdout.startswith("# Token Usage Report\n"))
+                    self.assertTrue(
+                        stdout.startswith("# All Token Monitor 完整报告\n")
+                    )
 
     def test_known_internal_diagnostic_codes_remain_stable(self):
         known_codes = (
