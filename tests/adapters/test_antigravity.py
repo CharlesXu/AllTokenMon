@@ -15,7 +15,7 @@ FIXTURE_HOME = Path(__file__).parents[1] / "fixtures"
 
 
 class AntigravityAdapterTests(unittest.TestCase):
-    def test_committed_cache_alias_fallback_and_discovery(self):
+    def test_committed_cache_preserves_unlisted_identity_and_discovery(self):
         result = scan(
             DiscoveryContext("linux", FIXTURE_HOME, {}),
             SOURCE_SPECS["antigravity"],
@@ -23,8 +23,8 @@ class AntigravityAdapterTests(unittest.TestCase):
         self.assertEqual(result.status, AdapterStatus.OK)
         self.assertEqual(len(result.records), 1)
         record = result.records[0]
-        self.assertEqual(record.model, "claude-opus-4-6")
-        self.assertEqual(record.provider, "anthropic")
+        self.assertEqual(record.model, "MODEL_PLACEHOLDER_M26")
+        self.assertEqual(record.provider, "antigravity")
         self.assertEqual(record.tokens, TokenBreakdown(12, 4, 2, 1, 3))
         self.assertEqual(record.dedup_key, "response-1")
         self.assertIsNone(record.cost)
@@ -51,18 +51,18 @@ class AntigravityAdapterTests(unittest.TestCase):
                 bounded = parse_antigravity((path,))
             self.assertEqual(bounded.status, AdapterStatus.PARTIAL)
 
-    def test_provider_ids_use_the_full_frozen_canonical_aliases(self):
-        aliases = {
-            "vertex": "anthropic",
-            "openai-codex": "openai",
-            "moonshot": "moonshotai",
-            "azure": "azure_ai",
-            "meta": "meta_llama",
-            "together": "together_ai",
-            "fireworks": "fireworks_ai",
-            "minimax_ai": "minimax",
-            "mistral": "mistralai",
-        }
+    def test_provider_ids_are_preserved_without_a_frozen_catalog(self):
+        providers = (
+            "vertex",
+            "openai-codex",
+            "moonshot",
+            "azure",
+            "meta",
+            "together",
+            "fireworks",
+            "minimax_ai",
+            "mistral",
+        )
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "session.jsonl"
             rows = [
@@ -71,14 +71,27 @@ class AntigravityAdapterTests(unittest.TestCase):
                     '"modelId":"unknown","providerId":"%s","input":1}'
                 )
                 % (index, 1785232800000 + index, provider)
-                for index, provider in enumerate(aliases)
+                for index, provider in enumerate(providers)
             ]
             path.write_text("\n".join(rows) + "\n", encoding="utf-8")
             result = parse_antigravity((path,))
         self.assertEqual(
             [record.provider for record in result.records],
-            list(aliases.values()),
+            [provider.replace("_", "-") for provider in providers],
         )
+
+    def test_credential_shaped_provider_is_not_reported(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "session.jsonl"
+            path.write_text(
+                '{"type":"usage","sessionId":"s","timestamp":1785232800000,'
+                '"modelId":"future-model","providerId":"sk-live-123456",'
+                '"input":1}\n',
+                encoding="utf-8",
+            )
+            result = parse_antigravity((path,))
+        self.assertEqual(result.records[0].provider, "antigravity")
+        self.assertNotIn("sk-live-123456", repr(result))
 
     def test_deep_jsonl_is_partial_and_does_not_crash_or_leak(self):
         with tempfile.TemporaryDirectory() as folder:

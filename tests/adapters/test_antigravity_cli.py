@@ -78,7 +78,7 @@ class AntigravityCliAdapterTests(unittest.TestCase):
         self.assertEqual(len(result.records), 1)
         record = result.records[0]
         self.assertEqual(record.provider, "google")
-        self.assertEqual(record.model, "gemini-3.5-flash-high")
+        self.assertEqual(record.model, "gemini-3-flash-a")
         self.assertEqual(record.session_id, "session-test")
         self.assertEqual(record.tokens, TokenBreakdown(1632, 300, 16000, 0, 40))
         self.assertEqual(record.dedup_key, "resp-1")

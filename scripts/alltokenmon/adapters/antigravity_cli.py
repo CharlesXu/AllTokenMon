@@ -16,10 +16,6 @@ _MAX_ROWS = 100_000
 _MAX_PROTO_BYTES = 32 * 1024 * 1024
 _MAX_PROTO_DEPTH = 4
 _MAX_VARINT_BYTES = 10
-_ALIASES = {
-    "gemini-3-flash-a": "gemini-3.5-flash-high",
-    "gemini-3-flash-agent": "gemini-3.5-flash-high",
-}
 
 
 class _ProtoError(ValueError):
@@ -161,7 +157,7 @@ def _generation(
             return None
         seen.add(response)
     model_raw = (_string(chat, 19, 2) or "unknown").strip() or "unknown"
-    model = _ALIASES.get(model_raw, model_raw)
+    model = model_raw
     generation = _message(chat, 9, 2)
     generated_at = _timestamp(_message(generation, 4, 3)) if generation else None
     return _record(

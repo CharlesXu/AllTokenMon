@@ -15,31 +15,12 @@ from .amp import (
     _text,
 )
 from .base import DiscoveryContext, SourceSpec
+from .claude import _canonical_provider_hint
 from .jsonio import read_json
 
 
 _RUNTIME = "trae"
 _MAX_ROWS = 100_000
-_MODELS = {
-    "GPT-5.4": "gpt-5.4",
-    "GPT-5.3-Codex": "gpt-5.3-codex",
-    "GPT-5.3 Codex": "gpt-5.3-codex",
-    "GPT-5.3": "gpt-5.3",
-    "GPT-5.2-Codex": "gpt-5.2-codex",
-    "GPT-5.2 Codex": "gpt-5.2-codex",
-    "GPT-5.2": "gpt-5.2",
-    "GPT-5.1-Codex": "gpt-5.1-codex",
-    "GPT-5.1 Codex": "gpt-5.1-codex",
-    "GPT-5.1": "gpt-5.1",
-    "Gemini 3.1 Pro": "gemini-3.1-pro",
-    "Gemini 3.1": "gemini-3.1",
-    "GLM 5.1": "glm-5.1",
-    "GLM-5.1": "glm-5.1",
-    "Claude Sonnet 4.6": "claude-sonnet-4.6",
-    "Claude-Sonnet-4.6": "claude-sonnet-4.6",
-    "Claude Sonnet 4.5": "claude-sonnet-4.5",
-    "Claude-Sonnet-4.5": "claude-sonnet-4.5",
-}
 
 
 def _session(
@@ -52,10 +33,20 @@ def _session(
     model_raw = _text(value.get("model_name"))
     mode = _text(value.get("mode"))
     model = (
-        _MODELS.get(model_raw, model_raw)
+        model_raw
         if model_raw is not None
         else "trae-{}".format(mode.lower()) if mode else "trae-unknown"
     )
+    provider_raw = (
+        _text(value.get("provider_id"))
+        or _text(value.get("provider_name"))
+        or _text(value.get("provider"))
+    )
+    provider = (
+        _canonical_provider_hint(provider_raw)
+        if provider_raw is not None
+        else None
+    ) or "trae"
     extra = _mapping(value.get("extra_info")) or {}
     tokens = TokenBreakdown(
         _integer(extra.get("input_token")),
@@ -75,7 +66,7 @@ def _session(
     return _record(
         _RUNTIME,
         path,
-        _trae_provider(model),
+        provider,
         model,
         session,
         timestamp,
@@ -88,19 +79,6 @@ def _session(
 
 def _integer(value: object) -> int:
     return safe_int(value) if type(value) is int else 0
-
-
-def _trae_provider(model: str) -> str:
-    lower = model.lower()
-    if "gpt" in lower:
-        return "openai"
-    if "claude" in lower:
-        return "anthropic"
-    if "gemini" in lower:
-        return "google"
-    if "glm" in lower:
-        return "zhipu"
-    return "trae"
 
 
 def _reported_cost(value: object) -> Optional[float]:

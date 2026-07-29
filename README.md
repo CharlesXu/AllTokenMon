@@ -80,6 +80,11 @@ python3 scripts/token_usage.py --model "gpt-5*,claude-*" --format json
 适配器可能报告 `partial` 或 `unsupported_format`。费用仅展示数据源实际报告的值，
 从不估算缺失费用。
 
+模型和 provider 以用量记录或会话元数据中的显式值为准，未知或未来型号原样保留，
+不会依赖需要持续更新的内置型号目录。Claude 适配器只在记录缺少身份信息时读取
+`--home` 下精确的 `.claude/settings.json` 白名单字段作当前配置补充；它不会把
+当前配置宣称为历史会话事实，也不会读取或输出密钥、请求头、账号、区域或私有端点。
+
 ### 开发验证
 
 ```sh
@@ -234,6 +239,14 @@ are reported only when a compatible existing Tokscale cache is already present:
 An adapter can report `partial` or `unsupported_format` when a local schema is
 newer, truncated, malformed, or only partly understood. Qualify comparisons
 when coverage is partial.
+
+Explicit model and provider values in usage or session evidence are authoritative.
+Unknown and future model identifiers are preserved instead of being rewritten
+through a time-sensitive built-in catalog. The Claude adapter consults only
+allowlisted fields in the exact `.claude/settings.json` below `--home`, and only
+to fill missing identity metadata. Current settings are not presented as
+historical session facts; credentials, headers, account or region fields, and
+private endpoint values are neither retained nor reported.
 
 ## Development
 

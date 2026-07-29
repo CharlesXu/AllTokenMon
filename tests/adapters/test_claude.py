@@ -16,27 +16,27 @@ FIXTURES = Path(__file__).parent / "fixtures" / "claude"
 
 
 class ClaudeAdapterTests(unittest.TestCase):
-    def test_shared_model_aliases_match_frozen_resolver(self):
+    def test_models_are_preserved_without_current_config_evidence(self):
         cases = (
-            ("claude-sonnet-4.6", "claude-sonnet-4-6"),
-            ("claude-opus-4.6-thinking", "claude-opus-4-6"),
-            ("anthropic/claude-4-6-haiku", "claude-haiku-4-6"),
-            ("gemini-3-flash-a", "gemini-3.5-flash-high"),
-            ("BIG PICKLE", "glm-4.7"),
-            ("K2P6", "kimi-k2.6"),
-            ("kimi-for-coding-highspeed", "kimi-k2.7-code-highspeed"),
-            ("MODEL_PLACEHOLDER_M187", "gemini-3.5-flash-extra-low"),
-            ("model_placeholder_m20", "gemini-3.5-flash-medium"),
-            ("MODEL_OPENAI_GPT_OSS_120B_MEDIUM", "gpt-oss-120b-medium"),
-            ("gemini-3.5-flash-low", "gemini-3.5-flash-medium"),
-            ("GROK-COMPOSER-2.5-FAST", "composer-2.5-fast"),
-            ("kimi-k2.5-nvfp4", "kimi-k2.5"),
-            ("unlisted-local-model", "unlisted-local-model"),
+            "claude-sonnet-4.6",
+            "claude-opus-4.6-thinking",
+            "anthropic/claude-4-6-haiku",
+            "gemini-3-flash-a",
+            "BIG PICKLE",
+            "K2P6",
+            "kimi-for-coding-highspeed",
+            "MODEL_PLACEHOLDER_M187",
+            "model_placeholder_m20",
+            "MODEL_OPENAI_GPT_OSS_120B_MEDIUM",
+            "gemini-3.5-flash-low",
+            "GROK-COMPOSER-2.5-FAST",
+            "kimi-k2.5-nvfp4",
+            "unlisted-local-model",
         )
 
         self.assertEqual(
-            tuple(_canonical_model(raw) for raw, _ in cases),
-            tuple(expected for _, expected in cases),
+            tuple(_canonical_model(raw) for raw in cases),
+            cases,
         )
 
     def test_assistant_usage_streaming_dedup_and_sidechain_fields_are_exact(self):
@@ -115,13 +115,14 @@ class ClaudeAdapterTests(unittest.TestCase):
             ),
         )
 
-    def test_explicit_provider_hints_use_first_frozen_canonical_tag(self):
+    def test_explicit_provider_hints_are_preserved_before_model_inference(self):
         cases = (
             ("openrouter/google", "openrouter"),
-            ("openai-codex", "openai"),
-            ("vertex-ai/anthropic", "anthropic"),
-            ("x-ai/anthropic", "xai"),
-            ("gjc-model-4o/anthropic", "anthropic"),
+            ("openai-codex", "openai-codex"),
+            ("vertex-ai/anthropic", "vertex-ai"),
+            ("x-ai/anthropic", "x-ai"),
+            ("gjc-model-4o/anthropic", "gjc-model-4o"),
+            ("sk-live-123456", "anthropic"),
             ("<synthetic>", "anthropic"),
             ("unknown", "anthropic"),
         )
@@ -147,27 +148,31 @@ class ClaudeAdapterTests(unittest.TestCase):
             tuple(record.provider for record in result.records),
             tuple(expected for _, expected in cases),
         )
+        self.assertNotIn("sk-live-123456", repr(result))
 
-    def test_model_normalization_and_provider_inference_match_frozen_cases(self):
+    def test_unknown_models_pass_through_and_avoid_catalog_inference(self):
         cases = (
             (
                 "anthropic/claude-4-6-sonnet",
                 None,
-                "claude-sonnet-4-6",
+                "anthropic/claude-4-6-sonnet",
                 "anthropic",
             ),
-            ("gpt-5.3-codex", None, "gpt-5.3-codex", "openai"),
+            ("gpt-5.3-codex", None, "gpt-5.3-codex", "unknown"),
             (
                 "gemini-3-flash-preview",
                 None,
                 "gemini-3-flash-preview",
-                "google",
+                "unknown",
             ),
-            ("MiniMax-M2.1", None, "MiniMax-M2.1", "minimax"),
-            ("mistral-large", None, "mistral-large", "mistralai"),
-            ("llama-3.3-70b", None, "llama-3.3-70b", "meta_llama"),
+            (
+                "future-provider-model-2028",
+                None,
+                "future-provider-model-2028",
+                "unknown",
+            ),
             ("<synthetic>", None, "<synthetic>", "unknown"),
-            ("gpt-5.3-codex", "anthropic", "gpt-5.3-codex", "openai"),
+            ("gpt-5.3-codex", "anthropic", "gpt-5.3-codex", "anthropic"),
             (
                 "gemini-3-flash-preview",
                 "openrouter/google",
@@ -210,10 +215,10 @@ class ClaudeAdapterTests(unittest.TestCase):
             ),
         )
 
-    def test_model_family_inference_precedes_slash_prefix_fallback(self):
+    def test_model_prefix_is_only_a_structural_provider_fallback(self):
         cases = (
-            ("openrouter/google/gemini-3-flash-preview", "google"),
-            ("openrouter/openai/gpt-5.3-codex", "openai"),
+            ("openrouter/google/gemini-3-flash-preview", "openrouter"),
+            ("openrouter/openai/gpt-5.3-codex", "openrouter"),
             ("openrouter/vendor-model", "openrouter"),
         )
         with tempfile.TemporaryDirectory() as directory:
@@ -237,6 +242,236 @@ class ClaudeAdapterTests(unittest.TestCase):
             tuple(record.provider for record in result.records),
             tuple(provider for _, provider in cases),
         )
+
+    def test_scan_uses_allowlisted_route_config_without_leaking_secrets(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            projects = home / ".claude" / "projects" / "safe"
+            projects.mkdir(parents=True)
+            (projects / "session.jsonl").write_text(
+                '{"type":"assistant","timestamp":"2026-07-26T06:00:00Z",'
+                '"requestId":"request","message":{"id":"message",'
+                '"model":"future-model-2028","usage":'
+                '{"input_tokens":2,"output_tokens":1}}}\n',
+                encoding="utf-8",
+            )
+            (home / ".claude" / "settings.json").write_text(
+                '{"env":{"CLAUDE_CODE_USE_VERTEX":"1",'
+                '"ANTHROPIC_AUTH_TOKEN":"SECRET_TOKEN_DO_NOT_LEAK",'
+                '"ANTHROPIC_VERTEX_PROJECT_ID":"PRIVATE_PROJECT_DO_NOT_LEAK"},'
+                '"apiKey":"PRIVATE_API_KEY_DO_NOT_LEAK"}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext("linux", home, {}),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(result.status, AdapterStatus.OK)
+        self.assertEqual(result.records[0].model, "future-model-2028")
+        self.assertEqual(result.records[0].provider, "google-vertex")
+        self.assertEqual(result.records[0].confidence, "estimated")
+        rendered = repr(result)
+        self.assertNotIn("SECRET_TOKEN_DO_NOT_LEAK", rendered)
+        self.assertNotIn("PRIVATE_PROJECT_DO_NOT_LEAK", rendered)
+        self.assertNotIn("PRIVATE_API_KEY_DO_NOT_LEAK", rendered)
+
+    def test_model_overrides_resolve_dynamically_without_retaining_deployment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            projects = home / ".claude" / "projects" / "safe"
+            projects.mkdir(parents=True)
+            private_deployment = "PRIVATE_DEPLOYMENT_DO_NOT_LEAK"
+            (projects / "session.jsonl").write_text(
+                '{"type":"assistant","timestamp":"2026-07-26T07:00:00Z",'
+                '"requestId":"request","message":{"id":"message",'
+                '"model":"' + private_deployment + '","usage":'
+                '{"input_tokens":3,"output_tokens":1}}}\n',
+                encoding="utf-8",
+            )
+            (home / ".claude" / "settings.json").write_text(
+                '{"modelOverrides":{"claude-opus-4-7":"'
+                + private_deployment
+                + '"},"env":{"CLAUDE_CODE_USE_BEDROCK":"1"}}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext("linux", home, {}),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(result.records[0].model, "claude-opus-4-7")
+        self.assertEqual(result.records[0].provider, "amazon-bedrock")
+        self.assertEqual(result.records[0].confidence, "estimated")
+        self.assertNotIn(private_deployment, repr(result))
+
+    def test_process_route_evidence_overrides_settings_route(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            projects = home / ".claude" / "projects" / "safe"
+            projects.mkdir(parents=True)
+            (projects / "session.jsonl").write_text(
+                '{"type":"assistant","timestamp":"2026-07-26T08:00:00Z",'
+                '"requestId":"request","message":{"id":"message",'
+                '"model":"claude-future","usage":{"input_tokens":1}}}\n',
+                encoding="utf-8",
+            )
+            (home / ".claude" / "settings.json").write_text(
+                '{"env":{"CLAUDE_CODE_USE_VERTEX":"1"}}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext(
+                    "windows",
+                    home,
+                    {
+                        "CLAUDE_CODE_USE_VERTEX": "0",
+                        "CLAUDE_CODE_USE_FOUNDRY": "1",
+                    },
+                ),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(result.records[0].provider, "microsoft-foundry")
+        self.assertEqual(result.records[0].confidence, "estimated")
+
+    def test_config_only_never_creates_usage_records(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            (home / ".claude").mkdir()
+            (home / ".claude" / "settings.json").write_text(
+                '{"model":"claude-current","env":'
+                '{"CLAUDE_CODE_USE_BEDROCK":"1"}}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext("linux", home, {}),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(result.status, AdapterStatus.NO_DATA)
+        self.assertEqual(result.records, ())
+
+    def test_explicit_record_identity_wins_and_config_only_fills_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            projects = home / ".claude" / "projects" / "safe"
+            projects.mkdir(parents=True)
+            (projects / "session.jsonl").write_text(
+                '{"type":"assistant","provider":"openrouter",'
+                '"timestamp":"2026-07-26T09:00:00Z","requestId":"one",'
+                '"message":{"id":"one","model":"future-explicit",'
+                '"usage":{"input_tokens":1}}}\n'
+                '{"type":"assistant","timestamp":"2026-07-26T09:00:01Z",'
+                '"requestId":"two","message":{"id":"two",'
+                '"usage":{"output_tokens":2}}}\n',
+                encoding="utf-8",
+            )
+            (home / ".claude" / "settings.json").write_text(
+                '{"model":"claude-configured","env":'
+                '{"CLAUDE_CODE_USE_VERTEX":"1"}}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext("linux", home, {}),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(
+            tuple(
+                (record.model, record.provider, record.confidence)
+                for record in result.records
+            ),
+            (
+                ("future-explicit", "openrouter", "exact"),
+                ("claude-configured", "google-vertex", "estimated"),
+            ),
+        )
+
+    def test_conflicting_routes_and_unsafe_models_do_not_leak(self):
+        sentinel = "sk-secret-SENTINEL_DO_NOT_LEAK"
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            projects = home / ".claude" / "projects" / "safe"
+            projects.mkdir(parents=True)
+            (projects / "session.jsonl").write_text(
+                '{"type":"assistant","timestamp":"2026-07-26T10:00:00Z",'
+                '"requestId":"one","message":{"id":"one",'
+                '"model":"' + sentinel + '","usage":{"input_tokens":1}}}\n',
+                encoding="utf-8",
+            )
+            (home / ".claude" / "settings.json").write_text(
+                '{"env":{"CLAUDE_CODE_USE_VERTEX":"1",'
+                '"CLAUDE_CODE_USE_BEDROCK":"1",'
+                '"ANTHROPIC_BASE_URL":"https://PRIVATE_ENDPOINT_DO_NOT_LEAK"},'
+                '"headers":{"Authorization":"PRIVATE_HEADER_DO_NOT_LEAK"}}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext("linux", home, {}),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(result.records, ())
+        rendered = repr(result)
+        self.assertNotIn(sentinel, rendered)
+        self.assertNotIn("PRIVATE_ENDPOINT_DO_NOT_LEAK", rendered)
+        self.assertNotIn("PRIVATE_HEADER_DO_NOT_LEAK", rendered)
+
+    def test_surrogate_models_are_rejected_without_adapter_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            projects = home / ".claude" / "projects" / "safe"
+            projects.mkdir(parents=True)
+            (projects / "session.jsonl").write_text(
+                '{"type":"assistant","requestId":"one","message":'
+                '{"id":"one","model":"\\ud800","usage":'
+                '{"input_tokens":1}}}\n',
+                encoding="utf-8",
+            )
+            (home / ".claude" / "settings.json").write_text(
+                '{"model":"\\ud800","modelOverrides":'
+                '{"claude-safe":"\\ud800"}}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext("linux", home, {}),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(result.records, ())
+        self.assertEqual(result.status, AdapterStatus.NO_DATA)
+
+    def test_model_override_is_applied_exactly_once(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            projects = home / ".claude" / "projects" / "safe"
+            projects.mkdir(parents=True)
+            (projects / "session.jsonl").write_text(
+                '{"type":"assistant","requestId":"one","message":'
+                '{"id":"one","model":"deploy-x","usage":'
+                '{"input_tokens":1}}}\n',
+                encoding="utf-8",
+            )
+            (home / ".claude" / "settings.json").write_text(
+                '{"modelOverrides":{"claude-a":"deploy-x",'
+                '"claude-b":"claude-a"}}',
+                encoding="utf-8",
+            )
+
+            result = scan(
+                DiscoveryContext("linux", home, {}),
+                SOURCE_SPECS["claude"],
+            )
+
+        self.assertEqual(result.records[0].model, "claude-a")
 
     def test_truncated_jsonl_retains_valid_records_and_reports_partial(self):
         result = parse_claude((FIXTURES / "partial.jsonl",))

@@ -23,8 +23,8 @@ class TraeAdapterTests(unittest.TestCase):
         )
         self.assertEqual(result.status, AdapterStatus.OK)
         record = result.records[0]
-        self.assertEqual(record.model, "claude-sonnet-4.6")
-        self.assertEqual(record.provider, "anthropic")
+        self.assertEqual(record.model, "Claude Sonnet 4.6")
+        self.assertEqual(record.provider, "trae")
         self.assertEqual(record.tokens, TokenBreakdown(100, 20, 30, 10))
         self.assertEqual((record.cost, record.cost_source), (0.5, "provider_reported"))
 
@@ -120,14 +120,15 @@ class TraeAdapterTests(unittest.TestCase):
         )
         self.assertEqual(selected[1].tokens.input, 99)
 
-    def test_glm_provider_matches_frozen_trae_identity(self):
+    def test_future_model_and_explicit_provider_are_preserved(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "batch.json"
             path.write_text(
                 json.dumps(
                     [
                         {
-                            "model_name": "GLM 5.1",
+                            "model_name": "Future Model 2030",
+                            "provider_id": "future-provider",
                             "session_id": "glm-session",
                             "usage_time": 1785232800,
                             "extra_info": {"input_token": 1},
@@ -137,7 +138,29 @@ class TraeAdapterTests(unittest.TestCase):
                 encoding="utf-8",
             )
             result = parse_trae((path,))
-        self.assertEqual(result.records[0].provider, "zhipu")
+        self.assertEqual(result.records[0].model, "Future Model 2030")
+        self.assertEqual(result.records[0].provider, "future-provider")
+
+    def test_credential_shaped_provider_is_not_reported(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "batch.json"
+            path.write_text(
+                json.dumps(
+                    [
+                        {
+                            "model_name": "Future Model",
+                            "provider_id": "sk-live-123456",
+                            "session_id": "safe-session",
+                            "usage_time": 1785232800,
+                            "extra_info": {"input_token": 1},
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            result = parse_trae((path,))
+        self.assertEqual(result.records[0].provider, "trae")
+        self.assertNotIn("sk-live-123456", repr(result))
 
     def test_deep_cached_json_returns_sanitized_unsupported_format(self):
         with tempfile.TemporaryDirectory() as folder:

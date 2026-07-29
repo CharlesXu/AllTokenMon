@@ -7,7 +7,7 @@ from ..normalize import parse_timestamp, safe_int, stable_key
 from ..schema import TokenBreakdown, UsageRecord
 from .amp import _jsonl, _provider, _record, _result, _scan, _text
 from .base import DiscoveryContext, SourceSpec
-from .claude import _canonical_model, _canonical_provider_hint
+from .claude import _canonical_provider_hint
 
 
 _RUNTIME = "antigravity"
@@ -15,7 +15,7 @@ _MAX_ROWS = 100_000
 def _provider_name(value: object, model: str) -> str:
     explicit = _text(value)
     if explicit:
-        return _canonical_provider_hint(explicit) or explicit.lower()
+        return _canonical_provider_hint(explicit) or "antigravity"
     return _provider(model, "antigravity")
 
 
@@ -28,9 +28,7 @@ def _usage(
     session = _text(value.get("sessionId"))
     if session is None or safe_int(value.get("timestamp")) <= 0:
         return None
-    model = _canonical_model(
-        _text(value.get("modelId")) or fallback_model or "unknown"
-    )
+    model = _text(value.get("modelId")) or fallback_model or "unknown"
     tokens = TokenBreakdown(
         safe_int(value.get("input")),
         safe_int(value.get("output")),
