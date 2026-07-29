@@ -1,0 +1,2 @@
+{"role":"user","sessionId":"zcode-session","model":"GLM-5.2","content":"sk-test-secret::zcode"}
+{"role":"assistant","sessionId":"zcode-session","timestamp":"2026-07-20T00:11:00Z","usage":{"input_tokens":30,"output_tokens":15,"cache_read_tokens":8,"cache_write_tokens":2,"reasoningTokens":3,"totalTokens":45},"content":"safe"}

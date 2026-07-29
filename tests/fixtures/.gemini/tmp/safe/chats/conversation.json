@@ -1,0 +1,19 @@
+{
+  "sessionId": "fixture-gemini-session",
+  "messages": [
+    {
+      "id": "fixture-gemini-message",
+      "timestamp": "2026-07-20T03:00:00Z",
+      "type": "gemini",
+      "model": "gemini-3-flash-preview",
+      "tokens": {
+        "promptTokenCount": 10,
+        "candidatesTokenCount": 5,
+        "cachedContentTokenCount": 2,
+        "thoughts": 1,
+        "totalTokenCount": 16
+      },
+      "content": "sk-test-secret::gemini"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+{"type":"model_change","id":"fixture-model-state","provider":"openai-codex","modelId":"gpt-5.2"}
+{"type":"message","id":"fixture-openclaw-message","message":{"role":"assistant","content":"sk-test-secret::openclaw","usage":{"input":10,"output":5,"cacheRead":2,"cacheWrite":1},"timestamp":1784512860000}}

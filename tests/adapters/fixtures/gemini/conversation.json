@@ -1,0 +1,27 @@
+{
+  "sessionId": "gemini-session-json",
+  "projectHash": "safe-project",
+  "startTime": "2026-07-20T01:00:00Z",
+  "lastUpdated": "2026-07-20T01:01:00Z",
+  "messages": [
+    {
+      "id": "gemini-user",
+      "type": "user",
+      "content": "SENTINEL_PRIVATE_PROMPT"
+    },
+    {
+      "id": "gemini-message-json",
+      "timestamp": "2026-07-20T01:01:00Z",
+      "type": "gemini",
+      "model": "gemini-3-flash-preview",
+      "tokens": {
+        "promptTokenCount": 100,
+        "candidatesTokenCount": 50,
+        "cachedContentTokenCount": 20,
+        "thoughts": 7,
+        "totalTokenCount": 157
+      },
+      "content": "SENTINEL_PRIVATE_RESPONSE"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{"type":"model_change","id":"model-state","provider":"openai-codex","modelId":"gpt-5.2"}
+{"type":"message","id":"ignored-user","message":{"role":"user","content":"SENTINEL_PRIVATE_PROMPT","usage":{"input":999,"output":999},"timestamp":1784512800000}}
+{"type":"message","id":"openclaw-message-1","message":{"role":"assistant","content":"SENTINEL_PRIVATE_RESPONSE","usage":{"input":100,"output":50,"cacheRead":20,"cacheWrite":5,"cost":{"total":0.05}},"timestamp":1784512860000}}
+{"type":"custom","customType":"model-snapshot","data":{"provider":"anthropic","modelId":"claude-opus-4-6"}}
+{"type":"message","id":"openclaw-message-2","message":{"role":"assistant","provider":"","model":"","content":[{"tool":"SENTINEL_PRIVATE_TOOL"}],"usage":{"input":10,"output":5,"cacheRead":1,"cacheWrite":2},"timestamp":1784512920000}}

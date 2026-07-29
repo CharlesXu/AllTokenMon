@@ -1,0 +1,1 @@
+{"executionId":"fixture-execution","chatSessionId":"fixture-session","status":"succeed","startTime":1785232800,"actions":[{"actionType":"say","output":"abcdefgh"}],"context":{"messages":[{"entries":[{"type":"text","text":"sk-test-secret::kiro"}]}]}}

@@ -1,0 +1,2 @@
+{"kind":"UserPromptEvent","timestampMs":1784506500000,"prompt":"PROMPT_SENTINEL_DO_NOT_LEAK::junie"}
+{"kind":"SessionA2uxEvent","timestampMs":1784506505000,"event":{"agentEvent":{"kind":"LlmResponseMetadataEvent","agent":{"id":"main"},"modelUsage":[{"model":"gpt-4.1","cost":0.4,"inputTokens":20,"outputTokens":13,"cacheInputTokens":7,"cacheCreateTokens":2,"reasoningTokens":3,"time":1000}]}}}

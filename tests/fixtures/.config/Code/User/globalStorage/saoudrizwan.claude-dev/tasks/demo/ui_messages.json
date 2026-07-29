@@ -1,0 +1,37 @@
+[
+  {
+    "id": "request-1",
+    "type": "say",
+    "say": "api_req_started",
+    "ts": "2026-02-18T12:00:00Z",
+    "text": "{\"cost\":0.12,\"tokensIn\":100,\"tokensOut\":50,\"cacheReads\":20,\"cacheWrites\":5,\"apiProtocol\":\"anthropic\",\"model\":\"claude-sonnet-4-6\"}"
+  },
+  {
+    "id": "request-1",
+    "type": "say",
+    "say": "api_req_started",
+    "ts": "2026-02-18T12:00:01Z",
+    "text": "{\"cost\":\"0.13\",\"tokensIn\":\"101\",\"tokensOut\":50,\"cacheReads\":20,\"cacheWrites\":5,\"apiProtocol\":\"anthropic\",\"model\":\"claude-sonnet-4-6\"}"
+  },
+  {
+    "id": "request-2",
+    "type": "say",
+    "say": "api_req_started",
+    "ts": "1780270097480",
+    "text": "{\"cost\":-1,\"tokensIn\":-4,\"tokensOut\":2,\"cacheReads\":-3,\"cacheWrites\":-2,\"apiProtocol\":\"bedrock/anthropic\"}"
+  },
+  {
+    "id": "request-zero",
+    "type": "say",
+    "say": "api_req_started",
+    "ts": 1780270097480,
+    "text": "{\"cost\":0,\"tokensIn\":0,\"tokensOut\":0,\"cacheReads\":0,\"cacheWrites\":0,\"apiProtocol\":\"\"}"
+  },
+  {
+    "id": "ignored",
+    "type": "say",
+    "say": "assistant_message",
+    "ts": "2026-02-18T12:00:03Z",
+    "text": "sk-test-secret::cline prompt and response content"
+  }
+]

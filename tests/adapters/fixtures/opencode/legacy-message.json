@@ -1,0 +1,17 @@
+{
+  "id": "opencode-shared-message",
+  "sessionID": "opencode-legacy-session",
+  "role": "assistant",
+  "modelID": "claude-sonnet-4",
+  "providerID": "anthropic",
+  "cost": 0.0123,
+  "tokens": {
+    "input": 100,
+    "output": 20,
+    "reasoning": 3,
+    "cache": {"read": 10, "write": 5}
+  },
+  "time": {"created": 1783882279705, "completed": 1783882279943},
+  "content": "SENTINEL_PRIVATE_CONTENT",
+  "tool": {"arguments": "SENTINEL_PRIVATE_TOOL"}
+}

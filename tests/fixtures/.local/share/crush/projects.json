@@ -1,0 +1,9 @@
+{
+  "projects": [
+    {
+      "path": "tests/fixtures/crush-project",
+      "data_dir": ".crush",
+      "private_prompt": "PROMPT_SENTINEL_DO_NOT_LEAK::crush"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "syncedAt": "2026-07-28T10:00:00Z",
+  "usage": {
+    "requestsUsed": 99,
+    "spendCents": 999
+  },
+  "workspaces": [
+    {
+      "id": "workspace-1",
+      "name": "PROMPT_SENTINEL_DO_NOT_LEAK::warp",
+      "requestsUsed": 7,
+      "spendCents": 123
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"id":"buddy-msg","timestamp":1784506380000,"type":"message","role":"assistant","status":"completed","sessionId":"buddy-session","providerData":{"model":"glm-5.2","messageId":"provider-msg"},"message":{"usage":{"cachedMissTokens":23,"outputTokens":15,"cacheTokens":9,"cachedWriteTokens":2,"reasoningTokens":3}},"content":"PROMPT_SENTINEL_DO_NOT_LEAK::codebuddy"}

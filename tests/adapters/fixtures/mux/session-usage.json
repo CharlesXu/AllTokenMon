@@ -1,0 +1,1 @@
+{"version":1,"private":"SENTINEL_PRIVATE","byModel":{"anthropic:claude-opus-4-6":{"input":{"tokens":16,"cost_usd":0.01},"cached":{"tokens":5,"cost_usd":0.02},"cacheCreate":{"tokens":2,"cost_usd":0.03},"output":{"tokens":9,"cost_usd":0.04},"reasoning":{"tokens":1,"cost_usd":0.05}}},"lastRequest":{"timestamp":1784505900000}}

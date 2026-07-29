@@ -1,0 +1,1 @@
+{"model":"custom:Claude-Opus-4.5-[Anthropic]-0","providerLock":"anthropic","providerLockTimestamp":"2026-07-20T00:01:00Z","tokenUsage":{"inputTokens":11,"outputTokens":4,"cacheCreationTokens":2,"cacheReadTokens":3,"thinkingTokens":1},"content":"PROMPT_SENTINEL_DO_NOT_LEAK::droid"}

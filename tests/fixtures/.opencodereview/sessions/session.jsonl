@@ -1,0 +1,2 @@
+{"type":"session_start","sessionId":"ignored","cwd":"/safe","private":"COOKIE_SENTINEL::opencodereview"}
+{"type":"llm_response","timestamp":"2026-07-20T00:12:05Z","model":"claude-sonnet-4","duration_ms":1000,"usage":{"prompt_tokens":22,"completion_tokens":14,"cache_read_tokens":8,"cache_write_tokens":2}}

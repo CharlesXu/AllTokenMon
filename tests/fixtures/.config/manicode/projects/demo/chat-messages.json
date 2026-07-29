@@ -1,0 +1,1 @@
+[{"variant":"user","content":"COOKIE_SENTINEL::codebuff"},{"variant":"ai","id":"codebuff-msg","timestamp":"2026-07-20T00:06:00Z","metadata":{"model":"claude-sonnet-4","codebuff":{"usage":{"prompt_tokens":17,"completion_tokens":10,"prompt_tokens_details":{"cached_tokens":6},"cache_creation_tokens":2}}},"credits":0.5}]

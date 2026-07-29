@@ -1,0 +1,2 @@
+{"type":"session_meta","sessionId":"antigravity-session","modelId":"MODEL_PLACEHOLDER_M26","privatePrompt":"COOKIE_SENTINEL::antigravity"}
+{"type":"usage","sessionId":"antigravity-session","timestamp":1785232800000,"input":12,"output":4,"cacheRead":2,"cacheWrite":1,"reasoning":3,"responseId":"response-1"}

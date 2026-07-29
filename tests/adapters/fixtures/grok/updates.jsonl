@@ -1,0 +1,3 @@
+{"method":"session/update","params":{"update":{"sessionUpdate":"available_commands_update"},"_meta":{"totalTokens":100,"agentTimestampMs":1784506200000}}}
+{"method":"session/update","params":{"update":{"sessionUpdate":"user_message_chunk","_meta":{"modelId":"grok-build","private":"SENTINEL_PRIVATE"}},"_meta":{"agentTimestampMs":1784506201000}}}
+{"method":"session/update","params":{"update":{"sessionUpdate":"agent_message_chunk"},"_meta":{"totalTokens":119,"agentTimestampMs":1784506202000}}}

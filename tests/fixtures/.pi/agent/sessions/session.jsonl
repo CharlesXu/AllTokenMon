@@ -1,0 +1,3 @@
+{"type":"title","title":"COOKIE_SENTINEL::pi"}
+{"type":"session","id":"pi-session","timestamp":"2026-07-20T00:02:00Z","cwd":"/safe"}
+{"type":"message","id":"pi-msg","timestamp":"2026-07-20T00:02:01Z","message":{"role":"assistant","model":"gpt-5","usage":{"input":12,"output":5,"cacheRead":3,"cacheWrite":2}}}

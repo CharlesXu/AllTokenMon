@@ -1,0 +1,15 @@
+{
+  "id": "fixture-opencode-message",
+  "sessionID": "fixture-opencode-session",
+  "role": "assistant",
+  "modelID": "claude-sonnet-4",
+  "providerID": "anthropic",
+  "tokens": {
+    "input": 10,
+    "output": 4,
+    "reasoning": 1,
+    "cache": {"read": 2, "write": 1}
+  },
+  "time": {"created": 1783882279705},
+  "content": "PROMPT_SENTINEL_DO_NOT_LEAK::opencode"
+}

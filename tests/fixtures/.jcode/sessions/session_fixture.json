@@ -1,0 +1,1 @@
+{"id":"jcode-session","provider_key":"openai","model":"gpt-5","working_dir":"/safe","messages":[{"id":"user","role":"user","content":"sk-test-secret::jcode"},{"id":"jcode-msg","role":"assistant","timestamp":"2026-07-20T00:08:00Z","token_usage":{"input_tokens":30,"output_tokens":12,"cache_read_input_tokens":10,"reasoning_output_tokens":2}}]}

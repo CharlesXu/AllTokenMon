@@ -1,0 +1,2 @@
+Date,Cloud Agent ID,Automation ID,Kind,Model,Max Mode,Input (w/ Cache Write),Input (w/o Cache Write),Cache Read,Output Tokens,Total Tokens,Cost,Private Prompt
+"2026-07-28T10:00:00.000Z","cloud-1","","Included","gpt-5.3-codex","No","120","100","30","40","190","$0.25","PROMPT_SENTINEL_DO_NOT_LEAK::cursor"

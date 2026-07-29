@@ -1,0 +1,6 @@
+{"timestamp":"2026-07-21T01:00:00Z","type":"session_meta","payload":{"id":"codex-reset-001","model_provider":"openai"}}
+{"timestamp":"2026-07-21T01:00:01Z","type":"turn_context","payload":{"model_info":{"slug":"gpt-5.1-codex"}}}
+{"timestamp":"2026-07-21T01:00:02Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":50,"cached_input_tokens":10,"output_tokens":5}}}}
+{"timestamp":"2026-07-21T01:00:03Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":70,"cached_input_tokens":15,"output_tokens":8}}}}
+{"timestamp":"2026-07-21T01:00:04Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":4,"cached_input_tokens":1,"output_tokens":2}}}}
+{"timestamp":"2026-07-21T01:00:05Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":9,"cached_input_tokens":3,"output_tokens":5}}}}

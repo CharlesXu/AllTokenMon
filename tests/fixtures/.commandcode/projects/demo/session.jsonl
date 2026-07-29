@@ -1,0 +1,2 @@
+{"role":"user","sessionId":"command-session","timestamp":"2026-07-20T00:09:00Z","content":"1234567"}
+{"role":"assistant","sessionId":"command-session","timestamp":"2026-07-20T00:09:01Z","content":"abcde","private":"COOKIE_SENTINEL::commandcode"}

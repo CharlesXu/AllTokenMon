@@ -1,0 +1,2 @@
+{"type":"assistant","sessionId":"claude-partial-001","timestamp":"2026-07-23T03:00:00Z","requestId":"request-partial-001","message":{"id":"message-partial-001","model":"claude-haiku-4-5","usage":{"input_tokens":9,"output_tokens":4}}}
+{"type":"assistant","message":{"content":"SENTINEL_TRUNCATED_PRIVATE"

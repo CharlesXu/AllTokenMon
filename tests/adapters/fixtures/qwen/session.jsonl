@@ -1,0 +1,2 @@
+{"type":"user","content":"SENTINEL_PRIVATE"}
+{"type":"assistant","model":"qwen3.5-plus","timestamp":"2026-07-20T00:04:00Z","sessionId":"qwen-session","usageMetadata":{"promptTokenCount":15,"candidatesTokenCount":8,"thoughtsTokenCount":2,"cachedContentTokenCount":5}}

@@ -1,0 +1,5 @@
+{"timestamp":"2026-07-25T02:00:00Z","type":"session_meta","payload":{"id":"codex-child-replay-001","source":{"subagent":{"thread_spawn":{"parent_thread_id":"codex-parent-replay-001","depth":1}}},"model_provider":"openai"}}
+{"timestamp":"2026-07-25T02:00:01Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":300,"output_tokens":30},"last_token_usage":{"input_tokens":300,"output_tokens":30}}}}
+{"timestamp":"2026-07-25T02:00:02Z","type":"turn_context","payload":{"model":"gpt-5.2-codex"}}
+{"timestamp":"2026-07-25T02:00:03Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":50,"output_tokens":5},"last_token_usage":{"input_tokens":50,"output_tokens":5}}}}
+{"timestamp":"2026-07-25T02:00:04Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":310,"output_tokens":32},"last_token_usage":{"input_tokens":10,"output_tokens":2}}}}

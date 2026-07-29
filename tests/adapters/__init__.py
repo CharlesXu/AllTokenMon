@@ -1,0 +1,1 @@
+"""Adapter fixture tests."""

@@ -1,0 +1,3 @@
+{"notification":{"sessionUpdate":"session_info_update","title":"sk-test-secret::devin-desktop"}}
+{"notification":{"sessionUpdate":"usage_update","_meta":{"cognition.ai/inputTokens":40,"cognition.ai/outputTokens":7,"cognition.ai/cachedReadTokens":10,"cognition.ai/cachedWriteTokens":2,"cognition.ai/model":"gpt-5"}}}
+{"notification":{"sessionUpdate":"usage_update","_meta":{"cognition.ai/inputTokens":50,"cognition.ai/outputTokens":8,"cognition.ai/cachedReadTokens":12,"cognition.ai/cachedWriteTokens":3,"cognition.ai/model":"gpt-5"}}}

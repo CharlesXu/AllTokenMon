@@ -1,0 +1,4 @@
+{"type":"init","model":"gemini-3.1-pro-preview","session_id":"gemini-session-stream"}
+{"type":"gemini","id":"gemini-direct","timestamp":"2026-07-20T02:00:00Z","tokens":{"input":10,"output":1,"cached":0,"thoughts":0,"tool":0,"total":11},"content":"SENTINEL_PRIVATE_OLD"}
+{"type":"gemini","id":"gemini-direct","timestamp":"2026-07-20T02:00:01Z","tokens":{"input":20,"output":2,"cached":5,"thoughts":3,"tool":0,"total":25},"content":"SENTINEL_PRIVATE_NEW"}
+{"type":"result","timestamp":"2026-07-20T02:00:02Z","stats":{"models":{"gemini-2.5-pro":{"tokens":{"prompt":12,"candidates":4,"cached":5,"thoughts":2}}}}}
