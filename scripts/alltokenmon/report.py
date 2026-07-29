@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 import unicodedata
 from typing import Mapping, Optional
 
@@ -32,6 +33,12 @@ def _ratio(value: Optional[object], *, percentage: bool = False) -> str:
         return "Unavailable"
     numeric = float(value)
     return f"{numeric:.2%}" if percentage else f"{numeric:.2f}"
+
+
+def _yi_tokens(value: object) -> str:
+    units = Decimal(int(value)) / Decimal(100_000_000)
+    rendered = format(units, ".8f").rstrip("0").rstrip(".")
+    return rendered or "0"
 
 
 def _quality_note(flag: str) -> str:
@@ -83,7 +90,7 @@ def render_markdown(report: Mapping[str, object]) -> str:
         "",
         "## Period Summary",
         "",
-        "| Period | Input | Output | Cache read | Cache write | Reasoning | Total | Messages | Cost |",
+        "| Period | Input (亿 tokens) | Output (亿 tokens) | Cache read (亿 tokens) | Cache write (亿 tokens) | Reasoning (亿 tokens) | Total (亿 tokens) | Messages | Cost |",
         "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for key, label in PERIODS:
@@ -92,9 +99,12 @@ def render_markdown(report: Mapping[str, object]) -> str:
         totals = period["totals"]
         assert isinstance(totals, Mapping)
         lines.append(
-            f"| {label} | {totals['input']} | {totals['output']} | "
-            f"{totals['cache_read']} | {totals['cache_write']} | "
-            f"{totals['reasoning']} | {totals['total']} | "
+            f"| {label} | {_yi_tokens(totals['input'])} | "
+            f"{_yi_tokens(totals['output'])} | "
+            f"{_yi_tokens(totals['cache_read'])} | "
+            f"{_yi_tokens(totals['cache_write'])} | "
+            f"{_yi_tokens(totals['reasoning'])} | "
+            f"{_yi_tokens(totals['total'])} | "
             f"{totals['message_count']} | {_cost(totals['cost'])} |"
         )
 
@@ -103,7 +113,7 @@ def render_markdown(report: Mapping[str, object]) -> str:
             "",
             "## Top Runtimes",
             "",
-            "| Period | Rank | Runtime | Total | Share | Cost |",
+            "| Period | Rank | Runtime | Total (亿 tokens) | Share | Cost |",
             "| --- | ---: | --- | ---: | ---: | ---: |",
         ]
     )
@@ -119,7 +129,7 @@ def render_markdown(report: Mapping[str, object]) -> str:
             assert isinstance(row, Mapping)
             lines.append(
                 f"| {label} | {rank} | {_table_cell(row['runtime'])} | "
-                f"{row['total']} | "
+                f"{_yi_tokens(row['total'])} | "
                 f"{_ratio(row['share'], percentage=True)} | {_cost(row['cost'])} |"
             )
 
@@ -128,7 +138,7 @@ def render_markdown(report: Mapping[str, object]) -> str:
             "",
             "## Top Models",
             "",
-            "| Period | Rank | Model | Total | Share | Cost |",
+            "| Period | Rank | Model | Total (亿 tokens) | Share | Cost |",
             "| --- | ---: | --- | ---: | ---: | ---: |",
         ]
     )
@@ -144,7 +154,7 @@ def render_markdown(report: Mapping[str, object]) -> str:
             assert isinstance(row, Mapping)
             lines.append(
                 f"| {label} | {rank} | {_table_cell(row['model'])} | "
-                f"{row['total']} | "
+                f"{_yi_tokens(row['total'])} | "
                 f"{_ratio(row['share'], percentage=True)} | {_cost(row['cost'])} |"
             )
 

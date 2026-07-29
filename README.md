@@ -56,6 +56,8 @@ python3 scripts/token_usage.py --model "gpt-5*,claude-*" --format json
 
 `--runtime` 与 `--model` 可以组合使用。使用 `--diagnostics` 可将脱敏后的
 适配器状态码写入标准错误；`--home PATH` 仅用于扫描替代的主目录或测试夹具。
+Markdown 表格中的 token 数以“亿 token”（1 亿 = 100,000,000）为单位；
+JSON 仍保留精确整数，便于后续计算。
 
 ### 周期定义
 
@@ -139,10 +141,12 @@ The Markdown output is a ready-to-read brief:
 
 ## Period Summary
 
-| Period | Input | Output | Cache read | Cache write | Reasoning | Total | Messages | Cost |
+| Period | Input (亿 tokens) | Output (亿 tokens) | Cache read (亿 tokens) | Cache write (亿 tokens) | Reasoning (亿 tokens) | Total (亿 tokens) | Messages | Cost |
 ```
 
-JSON output is intended for deterministic downstream analysis. The following
+Markdown token tables use `亿 tokens` (100 million tokens) as their display
+unit. JSON retains exact integer token counts for deterministic downstream
+analysis. The following
 is an abbreviated shape; the real output also includes runtime/model rankings,
 quality metrics, and sanitized diagnostics:
 

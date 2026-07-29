@@ -23,7 +23,7 @@ description: >-
    将命令视为本地、只读、无网络操作，只使用其标准输出中的汇总 JSON 进行分析。
 3. 仅当用户明确要求时添加 `--runtime <逗号分隔列表>` 或 `--model <逗号分隔的 glob>`，不要擅自过滤。
 4. 命令成功后，不要直接打开运行时对话记录、提示词、回复、源文件或数据库。
-5. 输出简洁的“今日、近 7 个本地自然日、本月至今、本地全部可用历史”周期表，包含已报告的 token 分类及总量；只有数据源提供费用时才展示费用。
+5. 输出简洁的“今日、近 7 个本地自然日、本月至今、本地全部可用历史”周期表，包含已报告的 token 分类及总量；表格中的 token 数统一除以 `100,000,000`，以“亿 token”为单位，并保留足够小数以避免把非零值显示成零；只有数据源提供费用时才展示费用。
 6. 给出 2–4 条点评，每条必须有已报告的数值、占比或比率支撑。
 7. 准确区分以下状态：
    - `no_data`：未发现受支持的本地记录。
@@ -43,7 +43,7 @@ description: >-
    Treat the command as local, read-only, and no-network. Use only its aggregate JSON stdout for analysis.
 3. Add `--runtime <csv>` or `--model <csv-globs>` only when the user requests those filters. Add no unrequested filters.
 4. After a successful run, never open runtime transcripts, prompts, responses, source files, or databases directly.
-5. Present a compact period table for Today, Trailing 7 days, Month to date, and All locally available history. Include the reported token categories and total; show provider-reported cost only when present.
+5. Present a compact period table for Today, Trailing 7 days, Month to date, and All locally available history. Express every token count in `亿 tokens` (100 million tokens), retaining enough decimals to avoid displaying a nonzero value as zero. Include the reported token categories and total; show provider-reported cost only when present.
 6. Add two to four observations. Back every observation with a reported number, share, or ratio.
 7. Distinguish these outcomes precisely:
    - `no_data`: no supported local records were found.

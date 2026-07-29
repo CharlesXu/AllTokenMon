@@ -15,14 +15,15 @@ from scripts.alltokenmon.schema import (
 NOW = datetime(2026, 7, 28, 12, tzinfo=timezone(timedelta(hours=8)))
 
 
-def _report(cost=None, runtime="codex", model="gpt-5"):
+def _report(cost=None, runtime="codex", model="gpt-5", tokens=None):
     record = UsageRecord(
         runtime=runtime,
         provider="openai",
         model=model,
         session_id="SECRET_SESSION",
         timestamp=NOW,
-        tokens=TokenBreakdown(
+        tokens=tokens
+        or TokenBreakdown(
             input=80,
             output=20,
             cache_read=20,
@@ -139,6 +140,27 @@ class MarkdownReportTests(unittest.TestCase):
             "SECRET_MESSAGE",
         ):
             self.assertNotIn(sentinel, rendered)
+
+    def test_markdown_token_tables_use_exact_yi_units(self):
+        rendered = render_markdown(
+            _report(
+                tokens=TokenBreakdown(
+                    input=394_000_000,
+                    output=1_000_000,
+                    cache_read=5_000_000,
+                )
+            )
+        )
+
+        self.assertIn("Input (亿 tokens)", rendered)
+        self.assertIn("Total (亿 tokens)", rendered)
+        self.assertIn("| Today | 3.94 | 0.01 | 0.05 | 0 | 0 | 4 |", rendered)
+        self.assertIn("| Today | 1 | codex | 4 | 100.00% |", rendered)
+
+    def test_markdown_yi_units_do_not_round_small_nonzero_usage_to_zero(self):
+        rendered = render_markdown(_report())
+
+        self.assertIn("| Today | 0.0000008 | 0.0000002 | 0.0000002 |", rendered)
 
     def test_markdown_consumes_only_report_mapping(self):
         report = _report()
