@@ -394,7 +394,7 @@ class ClaudeAdapterTests(unittest.TestCase):
         )
 
     def test_conflicting_routes_and_unsafe_models_do_not_leak(self):
-        sentinel = "sk-secret-SENTINEL_DO_NOT_LEAK"
+        sentinel = "REDACTED_SECRET_SENTINEL_DO_NOT_LEAK"
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             projects = home / ".claude" / "projects" / "safe"

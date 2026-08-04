@@ -1,8 +1,50 @@
 # Third-party notices
 
-This project studied the frozen Tokscale source baseline and redistributes a
-small WebAssembly decoder stack used only for reading Zed's local compressed
-thread data. The notices and complete license texts follow.
+All Token Monitor has no install-time or runtime package dependencies. Its
+Python implementation uses the standard library plus the vendored decoder
+components listed below.
+
+| Component | Version / baseline | How it is used | Bundled | License |
+| --- | --- | --- | --- | --- |
+| Tokscale | `22b9dbd5107a7eed15416c814f25c5ef72079cc8` | Format and behavior reference | No | MIT |
+| pywasm | 0.4.8 | WebAssembly interpreter for Zed's local compressed thread data | Yes, source | WTFPL |
+| zstdpy | `91642caf3168fcc99feeb2878e5c8f788b658db9` | Precompiled Zstandard decoder artifact | Yes, WebAssembly binary | 0BSD |
+| Zstandard | 1.4.5 / `b706286adbba780006a47ef92df0ad7a785666b6` | Decoder embedded in the zstdpy artifact | Yes, inside the WebAssembly binary | BSD |
+
+## Tokscale independence
+
+All Token Monitor does not import, execute, download, install, or call
+Tokscale. It can start, scan native runtime data, aggregate records, and render
+reports on a machine where Tokscale has never been installed.
+
+For backward-compatible data discovery, four adapters can also read compatible
+cache files if they already exist under conventional Tokscale cache paths:
+Cursor, Antigravity, Trae, and Warp. Codex discovery likewise recognizes an
+optional Tokscale headless export directory. These are passive local-file
+inputs only: their absence does not prevent All Token Monitor or its native
+runtime adapters from working, and All Token Monitor never asks Tokscale to
+create or update them.
+
+Tokscale source was studied as a frozen format and behavior reference, so this
+project does not claim a strict clean-room provenance relative to Tokscale.
+Tokscale is not bundled and is not a runtime dependency. Its notice is retained
+below for attribution and MIT-license compliance.
+
+## Development and CI tooling (not redistributed)
+
+The following direct tools run only in development or GitHub Actions. They are
+not included in the Skill ZIP and are not required by end users.
+
+| Tool | Use | License |
+| --- | --- | --- |
+| [coverage.py](https://github.com/nedbat/coveragepy) | Test coverage measurement | Apache-2.0 |
+| [actions/checkout](https://github.com/actions/checkout) | CI repository checkout | MIT |
+| [actions/setup-python](https://github.com/actions/setup-python) | CI Python provisioning | MIT |
+
+Python, operating-system facilities, and the agent runtimes whose local data is
+read are platforms or interoperability targets, not redistributed components.
+Their names in adapters and documentation do not imply that their software is
+bundled with or required by All Token Monitor.
 
 ## Tokscale
 

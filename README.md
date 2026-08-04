@@ -285,3 +285,10 @@ for the frozen format baseline and bundled Zed decoder is in
 All Token Monitor is released under the [MIT License](LICENSE). Bundled
 third-party components remain subject to the licenses listed in
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+The executable has no install-time or runtime package dependencies and never
+imports, executes, downloads, installs, or calls Tokscale. It only supports
+passive reading of pre-existing compatible Tokscale cache/export files as
+optional inputs. Because Tokscale source was studied as a frozen format and
+behavior reference, this project is described as a standalone implementation,
+not as a strict clean-room implementation.

@@ -1,5 +1,7 @@
 __pycache__/
 *.py[cod]
+.DS_Store
+/AllTokenMon-Skill-*.zip
 .coverage
 htmlcov/
 build/

@@ -634,7 +634,7 @@ class CliTests(unittest.TestCase):
         def scan(runtime, context):
             if runtime == "claude":
                 raise CookieSentinelException(
-                    "/Users/private/sk-test-secret-exception"
+                    "/Users/private/REDACTED_SECRET_EXCEPTION"
                 )
             return _result(
                 runtime,
