@@ -26,7 +26,22 @@ vendored 文件位于同一目录树。例如：
 
 无需安装 Python 包，也无需构建。
 
-### 运行
+### 自然语言使用
+
+在支持 Skill 的 Codex、Claude、Hermes、WorkBuddy 等 agent runtime 中，直接用
+自然语言提出需求即可。这里的 agent runtime 是调用本 Skill 的环境，不限制报告
+中可以分析的运行时。例如：
+
+1. `生成 All Token Monitor 完整报告，统计今日、近 7 日、本月至今和本地全部历史，并给出要点点评。`
+2. `只分析 Codex、Claude 和 Hermes，按运行时和模型列出 token 总量、占比和消息数。`
+3. `分析最近 7 日的 token 用量，只展示占比至少 1% 的模型，并点评缓存读取比例和输出/输入比。`
+4. `检查本机所有支持的运行时，告诉我哪些有数据、哪些是 partial 或 no_data，并说明跨运行时比较是否可靠。`
+5. `筛选 gpt-5* 和 claude-* 模型，生成适合终端阅读的对齐表格，同时输出精确 JSON 供后续计算。`
+
+自然语言调用默认生成脱敏汇总，不应要求 Skill 输出提示词、回复、会话 ID、
+本地路径或凭据。若调用环境没有自动发现本 Skill，再使用下面的命令行方式。
+
+### 命令行使用（高级）
 
 Linux 和 macOS：
 
@@ -119,7 +134,24 @@ Copy this repository into a Codex skill directory, keeping `SKILL.md`,
 
 No package installation or build step is required.
 
-## Run
+## Natural-language usage
+
+In an agent runtime that supports Skills, such as Codex, Claude, Hermes, or
+WorkBuddy, ask for the report directly in natural language. The agent runtime
+calling this Skill is independent of the runtimes included in the report. For
+example:
+
+1. `Generate the complete All Token Monitor report for today, the last 7 calendar days, month to date, and all locally retained history, with evidence-based commentary.`
+2. `Analyze only Codex, Claude, and Hermes, and show token totals, shares, and message counts by runtime and model.`
+3. `Review token usage for the last 7 days, keep only models with at least 1% share, and comment on cache-read share and the output-to-input ratio.`
+4. `Scan every supported runtime on this machine, identify ok, partial, and no_data coverage, and explain whether cross-runtime comparisons are reliable.`
+5. `Filter to gpt-5* and claude-* models, render terminal-aligned tables, and also return exact JSON for downstream calculations.`
+
+Natural-language calls should produce privacy-safe aggregates, not prompts,
+responses, session IDs, local paths, or credentials. Use the terminal commands
+below when the calling environment has not discovered the Skill automatically.
+
+## Run from the terminal (advanced)
 
 Linux and macOS:
 
